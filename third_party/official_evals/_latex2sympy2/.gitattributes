@@ -1,0 +1,3 @@
+# Vendored upstream bytes (the generated gen/PS*.py are CRLF). No EOL conversion, so the
+# SHA-256s in MANIFEST.json hold on every checkout.
+* -text

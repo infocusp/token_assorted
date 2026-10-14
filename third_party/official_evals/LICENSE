@@ -1,0 +1,25 @@
+The vendored evaluator sources in this directory are redistributed under their upstream
+licenses. See PROVENANCE.md for the per-file upstream repo, commit and license.
+
+  MIT:        hendrycks_math_equivalence.py, mwpbench_util.py, theoremqa_number_utils.py,
+              theoremqa_utils.py, olympiadbench_judge.py, dartmath_extract.py
+  Apache-2.0: metamath_extract.py  (full text: https://www.apache.org/licenses/LICENSE-2.0)
+
+The MIT License text, as it applies to the MIT-licensed files above (copyright remains with the
+respective upstream authors: Dan Hendrycks et al.; Microsoft Corporation; TIGER-AI-Lab;
+OpenBMB; HKUST NLP):
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+and associated documentation files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

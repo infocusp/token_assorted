@@ -1,0 +1,21 @@
+from third_party.official_evals._latex2sympy2.antlr4.Token import Token
+from third_party.official_evals._latex2sympy2.antlr4.InputStream import InputStream
+from third_party.official_evals._latex2sympy2.antlr4.FileStream import FileStream
+from third_party.official_evals._latex2sympy2.antlr4.StdinStream import StdinStream
+from third_party.official_evals._latex2sympy2.antlr4.BufferedTokenStream import TokenStream
+from third_party.official_evals._latex2sympy2.antlr4.CommonTokenStream import CommonTokenStream
+from third_party.official_evals._latex2sympy2.antlr4.Lexer import Lexer
+from third_party.official_evals._latex2sympy2.antlr4.Parser import Parser
+from third_party.official_evals._latex2sympy2.antlr4.dfa.DFA import DFA
+from third_party.official_evals._latex2sympy2.antlr4.atn.ATN import ATN
+from third_party.official_evals._latex2sympy2.antlr4.atn.ATNDeserializer import ATNDeserializer
+from third_party.official_evals._latex2sympy2.antlr4.atn.LexerATNSimulator import LexerATNSimulator
+from third_party.official_evals._latex2sympy2.antlr4.atn.ParserATNSimulator import ParserATNSimulator
+from third_party.official_evals._latex2sympy2.antlr4.atn.PredictionMode import PredictionMode
+from third_party.official_evals._latex2sympy2.antlr4.PredictionContext import PredictionContextCache
+from third_party.official_evals._latex2sympy2.antlr4.ParserRuleContext import RuleContext, ParserRuleContext
+from third_party.official_evals._latex2sympy2.antlr4.tree.Tree import ParseTreeListener, ParseTreeVisitor, ParseTreeWalker, TerminalNode, ErrorNode, RuleNode
+from third_party.official_evals._latex2sympy2.antlr4.error.Errors import RecognitionException, IllegalStateException, NoViableAltException
+from third_party.official_evals._latex2sympy2.antlr4.error.ErrorStrategy import BailErrorStrategy
+from third_party.official_evals._latex2sympy2.antlr4.error.DiagnosticErrorListener import DiagnosticErrorListener
+from third_party.official_evals._latex2sympy2.antlr4.Utils import str_list

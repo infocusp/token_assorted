@@ -1,0 +1,17 @@
+[project]
+name = "token-assorted"
+version = "0.1.0"
+description = "Unofficial implementation of 'Token Assorted' (Su et al., ICML 2025): a VQ-VAE (Stage 1) compresses chain-of-thought text into discrete latent tokens, and an LLM (Stage 2) is fine-tuned on mixed latent + text reasoning, trained on MetaMathQA."
+requires-python = ">=3.10"
+readme = "README.md"
+
+# NOTE: this repo vendors searchformer's Transformer (CC-BY-NC 4.0), so the
+# combined work is non-commercial. See README "Licenses".
+license = { text = "CC-BY-NC-4.0 (combined work; see README)" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+# The project is run module-style from the repo root (e.g. `python -m src.train`),
+# with `third_party/` and `src/` imported as top-level packages. No build/install step.

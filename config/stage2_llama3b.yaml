@@ -1,0 +1,63 @@
+# Token Assorted — Stage 2 (release config): full fine-tune of Llama-3.2-3B on assorted latent + text
+# chain-of-thought — the first m CoT tokens of each example are replaced by their Stage-1 latent codes.
+#
+#   python -m src.stage2_finetune --config config/stage2_llama3b.yaml
+#
+# Needs the Stage-1 codes artifact below (see the README: encode_dataset). Single GPU; same recipe as
+# config/stage2_llama1b.yaml except the base model and the micro-batch (2 × 16 accumulation steps, the
+# same effective batch of 32), which keeps the 3B full fine-tune on one 96 GB GPU.
+
+novelty: >-
+  Release copy of the Llama-3.2-3B Stage-2 Latent recipe behind the README results: full fine-tune (not
+  LoRA) on randomized latent/text replacement (m_max sampled from m_max_set), with the 1026 new
+  latent-token rows initialised from per-code chunk means (scale 0.25) so the model can read and emit
+  codes. deterministic: true; seed 42, the first of the README's seeds 42-44, GSM8K 61.4 (seed 43: 61.0, seed 44: 60.8).
+  The seed only drives the per-example m-sampling, so the three seeds differ by that sampling alone.
+
+base_model: unsloth/Llama-3.2-3B          # MUST match the tokenizer that built the artifact
+artifact: data/metamath_latent_codes.jsonl   # src/encode_dataset.py default --out (Stage-1 codes)
+n_val: 2000                               # held-out tail rows (aligned with Stage 1)
+codebook_size: 1024
+bo_token: <boLatent>
+eo_token: <eoLatent>
+code_token_fmt: <Latent-code-{}>
+chunk_length: 16                          # L = r = 16 (matches the Stage-1 compression_rate)
+m_max_set: [0, 72, 128, 160, 192, 224, 256]   # per example: sample m_max, then m in {0,16,...,m_max}
+
+# ---- optimization ----
+lr: 0.0001
+weight_decay: 0.0
+batch_size_training: 2                    # effective batch = 2 * gradient_accumulation_steps (16) = 32
+gradient_accumulation_steps: 16
+val_batch_size: 4
+context_length: 4096
+num_epochs: 1
+gradient_clipping: true
+gradient_clipping_threshold: 1.0
+gamma: 0.85                               # per-EPOCH StepLR; constant LR at 1 epoch
+use_fast_kernels: false
+activation_checkpointing: false
+
+# ---- full fine-tune ----
+full_finetune: true                       # full-parameter FT; the lora_* keys are used only when false
+lora_r: 8
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+lora_modules_to_save: [embed_tokens, lm_head]
+new_token_init: chunk_mean                # each <Latent-code-k> row starts at the mean base embedding of
+                                          #   the text chunks that code encodes (distinct rows from step 0)
+new_token_init_scale: 0.25                # norm multiplier on the mean base-row norm
+
+# ---- run / logging ----
+output_dir: runs/stage2-llama3b
+seed: 42
+deterministic: true                       # bit-reproducible: forces deterministic kernels (~7-8% slower)
+num_workers: 4
+save_model: true
+run_validation: true
+mlflow: true
+mlflow_experiment: stage2(SFT)
+mlflow_run_name: stage2-llama3b
+mlflow_log_checkpoint: false              # true would upload the ~6.4 GB checkpoint to MLflow
+max_train_step: 0                         # 0 = full epoch (any other value truncates the run)

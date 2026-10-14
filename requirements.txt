@@ -1,0 +1,50 @@
+# Token Assorted — dependencies (Stage 1, plus the official scorers used by the Stage-2 eval)
+#
+# Stage 2 (src/stage2_finetune.py) additionally needs peft, accelerate, fire and llama-cookbook.
+# Install those with the commands in the README's Stage-2 Setup, not from this file: llama-cookbook
+# must be installed with --no-deps, which a requirements file cannot express.
+#
+# PyTorch on Blackwell (RTX PRO 6000, sm_120/sm_122): use the CUDA 12.8 wheel index.
+# The cu128 wheels embed sm_120 SASS + compute_120 PTX (JIT-forward-compiles to 12.x).
+# If the runtime kernel-launch check in src/utils.py:assert_gpu_ok() raises
+# "no kernel image is available for execution on the device", bump torch to a newer
+# cu128 release (e.g. 2.9.x) or fall back to the cu128 nightly:
+#   uv pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu128
+#
+# The cu128 wheel also ships CPU kernels, so the CPU smoke test works with this same install.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.8.0
+
+# Vector quantizer / codebook (straight-through estimator, EMA, dead-code restart,
+# low-dim codebook). We do NOT hand-roll the quantizer. >=1.20 has rotation_trick,
+# codebook_dim and the forward(mask=...) argument we rely on.
+vector-quantize-pytorch>=1.20.0
+
+# Data + tokenizers
+datasets>=2.19.0
+transformers>=4.45.0   # gpt2 tokenizer (smoke) + Llama-3.2 tokenizer (full run)
+
+# Utilities
+numpy
+pyyaml
+tqdm
+einops          # vector-quantize-pytorch dependency; pinned explicitly for reproducibility
+
+# Official benchmark scorers (src/official_eval.py). sympy's parse_latex backend, called by
+# OpenBMB's AutoScoringJudge (olympiad-math) and DART-Math's EvaluatorMath (deepmind-math).
+# TheoremQA's `latex2sympy2` is NOT a dependency: it pins antlr4 4.7.2, which would conflict with
+# the pin below. It is vendored on a private copy of the 4.7.2 runtime in
+# third_party/official_evals/_latex2sympy2/ (scripts/vendor_latex2sympy2.py). Do not
+# `pip install latex2sympy2`: it would replace this antlr4 and break olympiad-math.
+antlr4-python3-runtime==4.11.1
+
+# Tests
+pytest>=8.0
+
+# Experiment tracking: MLflow logging is enabled in the shipped configs of both stages (`mlflow: true`;
+# pass --no-mlflow to disable it). Stage-1 runs land in experiment "stage1(VQ-VAE)". Tested with mlflow 3.14.0.
+mlflow
+
+# Optional, imported lazily (NOT a hard dependency):
+#   uv pip install wandb     # enable with --wandb

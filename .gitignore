@@ -2,6 +2,7 @@
 /runs
 /data
 /mlruns
+/runs_smoke
 */__pycache__
 *.pyc
 

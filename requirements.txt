@@ -19,17 +19,20 @@ torch==2.8.0
 # Vector quantizer / codebook (straight-through estimator, EMA, dead-code restart,
 # low-dim codebook). We do NOT hand-roll the quantizer. >=1.20 has rotation_trick,
 # codebook_dim and the forward(mask=...) argument we rely on.
-vector-quantize-pytorch>=1.20.0
+# Pinned exactly: with seed 0 + deterministic: true, Stage 1 is bit-reproducible on 1.29.1 (every train/val
+# metric and every best.pt tensor identical across reruns), but 1.31.6 diverges from step 20 (val recon_ce
+# 2.165 vs 2.159 at 100k steps) and yields different Stage-1 codes. Do not float this version.
+vector-quantize-pytorch==1.29.1
 
 # Data + tokenizers
-datasets>=2.19.0
-transformers>=4.45.0   # gpt2 tokenizer (smoke) + Llama-3.2 tokenizer (full run)
+datasets==2.19.1
+transformers==5.12.1   # gpt2 tokenizer (smoke) + Llama-3.2 tokenizer (full run)
 
 # Utilities
-numpy
-pyyaml
-tqdm
-einops          # vector-quantize-pytorch dependency; pinned explicitly for reproducibility
+numpy==2.4.4
+pyyaml==6.0.3
+tqdm==4.66.5
+einops==0.8.2   # vector-quantize-pytorch dependency; pinned explicitly for reproducibility
 
 # Official benchmark scorers (src/official_eval.py). sympy's parse_latex backend, called by
 # OpenBMB's AutoScoringJudge (olympiad-math) and DART-Math's EvaluatorMath (deepmind-math).
@@ -40,11 +43,11 @@ einops          # vector-quantize-pytorch dependency; pinned explicitly for repr
 antlr4-python3-runtime==4.11.1
 
 # Tests
-pytest>=8.0
+pytest==9.1.1
 
 # Experiment tracking: MLflow logging is enabled in the shipped configs of both stages (`mlflow: true`;
 # pass --no-mlflow to disable it). Stage-1 runs land in experiment "stage1(VQ-VAE)". Tested with mlflow 3.14.0.
-mlflow
+mlflow==3.14.0
 
 # Optional, imported lazily (NOT a hard dependency):
 #   uv pip install wandb     # enable with --wandb

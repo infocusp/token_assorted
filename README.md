@@ -79,6 +79,8 @@ discrete latent codes (16 text tokens → 1 code, codebook of 1024 entries) and 
 back to text. The loss, components and architecture walkthrough are in
 [src/README.md](src/README.md#stage-1--vq-vae-cot-compression-into-latent-codes).
 
+🤗 **Pre-trained checkpoint:** the Stage-1 weights (seed 0, 100k steps) can be downloaded from Hugging Face: [infocusp/stage1-VQ-VAE](https://huggingface.co/infocusp/stage1-VQ-VAE).
+
 ---
 
 ### Setup
@@ -175,6 +177,8 @@ tokens of each example are replaced by their latent codes, with *m* randomized p
 vocabulary extension, randomized replacement and training loop are in
 [src/README.md](src/README.md#stage-2--llm-fine-tuning-on-assorted-tokens).
 
+🤗 **Pre-trained checkpoint:** the fine-tuned Llama-3.2-1B Latent model can be downloaded from Hugging Face and run directly, without re-training: [infocusp/stage2-LLM](https://huggingface.co/infocusp/stage2-LLM).
+
 ### Setup
 
 **1. Base model weights.** The base Llama-3.2-1B **weights** (~2.5 GB `model.safetensors`) must be present in the HF
@@ -187,12 +191,10 @@ hf download unsloth/Llama-3.2-1B
 **2. Dependencies.** Stage 2 **extends the Stage-1 `.venv`** with pure-Python deps only (no CUDA extensions):
 
 ```bash
-uv pip install "peft>=0.18.0" accelerate fire
-uv pip install --no-deps llama-cookbook          # only its train loop is used; don't pull its deps
+uv pip install "peft==0.19.1" "accelerate==1.14.0" "fire==0.7.1"
+uv pip install --no-deps "llama-cookbook==0.0.5.post1"
 ```
 
-> `peft>=0.18` is required for transformers 5.x. `src/stage2_finetune.py` shims llama-cookbook's one
-> incompatibility with newer `accelerate`, so no pinning is needed.
 
 ### Usage
 

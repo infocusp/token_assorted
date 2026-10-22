@@ -32,7 +32,6 @@ so llama-cookbook's ``ConcatDataset`` (sequence packing) can concatenate them.
 """
 from __future__ import annotations
 
-import json
 import random
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -198,8 +197,10 @@ def build_stage2_datasets(
     """Return ``(train_ds, val_ds)`` with a deterministic tail-holdout split (Stage-1 convention)."""
     rows = load_stage2_records(artifact, limit=limit)
     train_rows, val_rows = deterministic_train_val_split(rows, n_val)
-    mk = lambda rs: Stage2Dataset(list(rs), tokenizer, vocab, m_max_set, chunk_length, seed,
-                                  sol_only=sol_only)
+    def mk(rs):
+        return Stage2Dataset(list(rs), tokenizer, vocab, m_max_set, chunk_length, seed,
+                             sol_only=sol_only)
+
     return mk(train_rows), mk(val_rows)
 
 

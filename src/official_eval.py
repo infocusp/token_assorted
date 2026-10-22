@@ -36,7 +36,6 @@ from third_party.official_evals import mwpbench_util as _mwpbench
 from third_party.official_evals import theoremqa_utils as _theoremqa
 from third_party.official_evals.dartmath_eval import EvaluatorMath as _DartEvaluatorMath
 from third_party.official_evals.dartmath_extract import EvaluatorBase as _DartEvaluatorBase
-from third_party.official_evals.hendrycks_math_equivalence import is_equiv as _hendrycks_is_equiv
 
 
 # --------------------------------------------------------------------------------------

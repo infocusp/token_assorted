@@ -4,7 +4,6 @@ import json
 import math
 
 import pytest
-import torch
 
 from scripts.make_fixture import make_rows
 from src.data import assemble_example

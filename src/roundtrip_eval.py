@@ -33,7 +33,7 @@ import json
 import os
 import re
 from collections import Counter
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import torch
 import yaml

@@ -48,7 +48,7 @@ def test_no_distributed_keys_in_shipped_configs(path):
 def test_source_has_no_distributed_machinery():
     src = (_REPO_ROOT / "src" / "stage2_finetune.py").read_text()
     # Ignore the docstring/comment lines that explain the absence.
-    code = "\n".join(l for l in src.splitlines() if not l.lstrip().startswith("#"))
+    code = "\n".join(line for line in src.splitlines() if not line.lstrip().startswith("#"))
     found = [tok for tok in _BANNED_SOURCE_TOKENS if tok in code]
     assert not found, f"stage2_finetune.py reintroduced distributed machinery: {found}"
 

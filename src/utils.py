@@ -10,7 +10,7 @@ import csv
 import json
 import os
 import random
-from dataclasses import asdict, dataclass, field, fields
+from dataclasses import asdict, dataclass, fields
 from typing import Any, Dict, Optional
 
 import numpy as np

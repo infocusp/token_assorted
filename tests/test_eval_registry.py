@@ -114,7 +114,8 @@ def test_batched_evaluate_matches_sequential():
 
     # varied lengths force real padding and a nontrivial length-sort within batches
     rows = _stub_rows((5, 1, 9, 3, 7, 2, 8))
-    get_q = lambda r: r["q"]
+    def get_q(r):
+        return r["q"]
 
     seq = evaluate(_StubModel(), _StubTok(), rows, get_q, _stub_gold, "cpu",
                    max_new_tokens=4, batch_size=1, dataset="gsm8k")

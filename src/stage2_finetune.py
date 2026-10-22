@@ -612,7 +612,6 @@ def build_loaders(cfg, tok, vocab, tc):
 # Smoke: device-agnostic wiring check (does NOT use train(), which hardcodes cuda:0)
 # --------------------------------------------------------------------------------------
 def run_smoke(cfg: Dict[str, Any]) -> None:
-    import torch
     from transformers import default_data_collator
 
     from .stage2_data import decode_example
@@ -649,7 +648,7 @@ def run_smoke(cfg: Dict[str, Any]) -> None:
         # labels must be -100 exactly over [BOS]+prompt and real elsewhere
         assert item["labels"][0] == -100
         n_masked = sum(1 for x in item["labels"] if x == -100)
-        assert all(l == -100 for l in item["labels"][:n_masked]), "mask must be a leading prefix"
+        assert all(lab == -100 for lab in item["labels"][:n_masked]), "mask must be a leading prefix"
         if no_latent:
             # Sol-Only / CoT baseline: no latent block may EVER appear. Asserting the absence is a
             # stronger check for these configs than the saw_latent search it replaces.
@@ -677,7 +676,7 @@ def run_smoke(cfg: Dict[str, Any]) -> None:
 
     chunk = train_packed[0]
     assert len(chunk["input_ids"]) == len(chunk["labels"]) == tc.context_length
-    assert any(l == -100 for l in chunk["labels"]), "prompt masks (-100) not preserved by packing"
+    assert any(lab == -100 for lab in chunk["labels"]), "prompt masks (-100) not preserved by packing"
 
     # One forward/backward on a packed chunk; assert new-token rows receive gradient.
     batch = default_data_collator([chunk])

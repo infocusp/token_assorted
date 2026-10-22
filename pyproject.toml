@@ -13,5 +13,12 @@ license = { text = "CC-BY-NC-4.0 (combined work; see README)" }
 testpaths = ["tests"]
 addopts = "-q"
 
+[tool.ruff]
+# third_party/ is vendored upstream code (see third_party/*/PROVENANCE.md): never lint or edit it.
+extend-exclude = ["third_party"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
 # The project is run module-style from the repo root (e.g. `python -m src.train`),
 # with `third_party/` and `src/` imported as top-level packages. No build/install step.

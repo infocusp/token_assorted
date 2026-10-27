@@ -87,6 +87,7 @@ back to text. The loss, components and architecture walkthrough are in
 
 ```bash
 uv venv --python 3.12
+source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
@@ -246,7 +247,7 @@ models take about the same as their base models):
 
 **Setup.** 4 base models (Llama-3.2-1B, 1B-Instruct, 3B, 3B-Instruct) × 3 training variants × 3 seeds (42, 43, 44) = 36 deterministic full fine-tunes (1 epoch on MetaMathQA, lr 1e-4, effective batch 32), each evaluated greedily in fp32 on all 7 benchmarks. The variants are **Sol-Only** (prompt → answer, no reasoning), **CoT** (full text reasoning) and **Latent** (assorted latent + text, the paper's method). 🔬 **ours** rows are mean ± sample std over the 3 seeds; 📄 **paper** rows are the paper's numbers as printed (Su et al., Tables 4.2 and 4.3). The paper's models are Llama-3.2-1B, Llama-3.2-3B and Llama-3.1-8B, so the Instruct models have no paper counterpart and the 8B model is not reproduced here.
 
-#### Accuracy (%) — counterpart of the paper's Table 4.2
+### Accuracy (%) — counterpart of the paper's Table 4.2
 
 - 🏠 in-domain (GSM8K and MATH were used to generate MetaMathQA) · 🌍 out-of-domain.
 - 📊 All: unweighted mean of the 7 benchmark columns (the paper's "All Datasets"), computed per run before averaging over seeds.
@@ -254,7 +255,9 @@ models take about the same as their base models):
 - **Δ Latent − CoT**, in accuracy points: 🟢 Latent is better · 🔴 worse · ⚪ no difference (ours: |Δ| ≤ 1 std over seeds).
 - The paper's Δ is computed from its printed numbers.
 
-| 🦙 **Llama-3.2-1B** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+#### <img align="top" src="assets/model-llama-3.2-1b.svg" alt="Llama-3.2-1B">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 2.6 | 2.4 | 🥇 **6.7** | 3.3 | 0.8 | 🥇 **1.9** | 2.9 | 2.9 |
 |  | 📄 paper | 🥇 **4.7** | 🥇 **6.8** | 0.0 | 🥇 **10.4** | 🥇 **5.3** | 1.3 | 🥇 **3.9** | 🥇 **4.6** |
@@ -265,14 +268,22 @@ models take about the same as their base models):
 | **Δ Latent − CoT** | 🔬 ours | 🔴 −1.6 ± 0.2 | 🔴 −5.5 ± 0.7 | 🔴 −8.9 ± 3.8 | ⚪ +0.5 ± 1.3 | 🔴 −0.6 ± 0.4 | ⚪ −0.1 ± 0.5 | ⚪ −0.5 ± 0.5 | 🔴 −2.4 ± 0.3 |
 |  | 📄 paper | 🟢 +4.2 | 🟢 +6.0 | ⚪ 0.0 | 🟢 +11.2 | 🟢 +3.4 | 🟢 +0.3 | 🟢 +1.5 | 🟢 +3.7 |
 
-| 🦙 **Llama-3.2-1B-Instruct** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-1b-instruct.svg" alt="Llama-3.2-1B-Instruct">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 6.5 | 6.4 | 3.3 | 6.9 | 2.4 | 3.1 | 4.6 | 4.7 |
 | **CoT** | 🔬 ours | 18.2 | 50.9 | 13.3 | 15.9 | 9.5 | 4.1 | 9.9 | 17.4 |
 | **Latent** | 🔬 ours | 15.8 ± 0.1 | 45.8 ± 1.5 | 10.0 ± 0.0 | 14.6 ± 1.2 | 8.9 ± 0.3 | 4.1 ± 0.8 | 9.6 ± 0.5 | 15.6 ± 0.2 |
 | **Δ Latent − CoT** | 🔬 ours | 🔴 −2.3 ± 0.1 | 🔴 −5.1 ± 1.5 | 🔴 −3.3 ± 0.0 | 🔴 −1.3 ± 1.2 | 🔴 −0.5 ± 0.3 | ⚪ 0.0 ± 0.8 | ⚪ −0.3 ± 0.5 | 🔴 −1.8 ± 0.2 |
 
-| 🦙 **Llama-3.2-3B** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-3b.svg" alt="Llama-3.2-3B">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 🥇 **6.4** | 8.0 | 🥇 **10.0** | 4.7 | 2.8 | 🥇 **2.8** | 6.0 | 5.8 |
 |  | 📄 paper | 6.1 | 🥇 **8.1** | 3.3 | 🥇 **14.0** | 🥇 **7.0** | 1.8 | 🥇 **6.8** | 🥇 **6.7** |
@@ -283,7 +294,11 @@ models take about the same as their base models):
 | **Δ Latent − CoT** | 🔬 ours | 🔴 −1.5 ± 0.6 | 🔴 −3.9 ± 0.3 | ⚪ +2.2 ± 7.7 | ⚪ −0.5 ± 1.0 | 🔴 −0.8 ± 0.2 | ⚪ +0.4 ± 0.8 | ⚪ −0.3 ± 1.0 | ⚪ −0.6 ± 1.1 |
 |  | 📄 paper | 🟢 +4.2 | 🟢 +4.1 | 🟢 +6.6 | 🔴 −0.2 | 🟢 +2.0 | 🟢 +2.0 | 🟢 +1.9 | 🟢 +2.9 |
 
-| 🦙 **Llama-3.2-3B-Instruct** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-3b-instruct.svg" alt="Llama-3.2-3B-Instruct">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 8.4 | 10.5 | 10.0 | 6.0 | 3.9 | 2.5 | 9.1 | 7.2 |
 | **CoT** | 🔬 ours | 26.7 | 69.9 | 16.7 | 26.1 | 13.5 | 5.8 | 11.9 | 24.4 |
@@ -296,14 +311,16 @@ models take about the same as their base models):
 - The paper's iCoT and Pause Token baselines are not reproduced and are omitted.
 - **In our runs Latent does not improve on CoT:** GSM8K and MATH are lower for every base model (GSM8K −3.9 to −5.5 points; paper: +4.1 to +6.0) and All is 0.6–2.4 points lower (paper: +2.9 to +3.7), though only within seed noise for 3B.
 
-#### Mean generated tokens — counterpart of the paper's Table 4.3
+### Mean generated tokens — counterpart of the paper's Table 4.3
 
 - Same columns and 🔬/📄 rows as above.
 - 🥇 **bold**: the shorter of ours and paper (lower is better).
 - **Δ Latent vs CoT**, the change in response length relative to CoT: 🟢 shorter · 🔴 longer · ⚪ within seed noise (ours).
 - The paper's percentages are as printed.
 
-| 🦙 **Llama-3.2-1B** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+#### <img align="top" src="assets/model-llama-3.2-1b.svg" alt="Llama-3.2-1B">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 8.3 | 7.1 | 12.1 | 6.7 | 8.3 | 7.4 | 7.5 | 8.2 |
 | **CoT** | 🔬 ours | 🥇 **164.0** | 🥇 **120.0** | 🥇 **181.2** | 🥇 **154.7** | 🥇 **193.7** | 🥇 **173.6** | 🥇 **166.8** | 🥇 **164.9** |
@@ -313,14 +330,22 @@ models take about the same as their base models):
 | **Δ Latent vs CoT** | 🔬 ours | 🟢 −17 ± 7 % | 🟢 −15 ± 3 % | 🟢 −15 ± 6 % | 🟢 −24 ± 1 % | 🟢 −19 ± 5 % | 🟢 −14 ± 10 % | 🟢 −15 ± 9 % | 🟢 −17 ± 6 % |
 |  | 📄 paper | 🟢 −22 % | 🟢 −5 % | 🟢 −11 % | 🟢 −34 % | 🟢 −23 % | 🟢 −22 % | 🟢 −22 % | 🟢 −21 % |
 
-| 🦙 **Llama-3.2-1B-Instruct** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-1b-instruct.svg" alt="Llama-3.2-1B-Instruct">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 8.8 | 7.1 | 9.6 | 7.1 | 10.2 | 8.6 | 7.8 | 8.4 |
 | **CoT** | 🔬 ours | 156.0 | 119.7 | 185.9 | 140.6 | 177.8 | 163.7 | 166.6 | 158.6 |
 | **Latent** | 🔬 ours | 140.4 ± 6.3 | 102.8 ± 2.6 | 161.5 ± 14.9 | 113.4 ± 4.1 | 163.9 ± 5.7 | 156.2 ± 16.1 | 146.0 ± 10.6 | 140.6 ± 7.9 |
 | **Δ Latent vs CoT** | 🔬 ours | 🟢 −10 ± 4 % | 🟢 −14 ± 2 % | 🟢 −13 ± 8 % | 🟢 −19 ± 3 % | 🟢 −8 ± 3 % | ⚪ −5 ± 10 % | 🟢 −12 ± 6 % | 🟢 −11 ± 5 % |
 
-| 🦙 **Llama-3.2-3B** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-3b.svg" alt="Llama-3.2-3B">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 8.6 | 7.1 | 8.8 | 7.0 | 11.2 | 8.0 | 8.4 | 8.4 |
 | **CoT** | 🔬 ours | 🥇 **210.1** | 🥇 **123.2** | 🥇 **276.8** | 🥇 **186.0** | 🥇 **248.2** | 🥇 **259.5** | 🥇 **225.5** | 🥇 **218.5** |
@@ -330,7 +355,11 @@ models take about the same as their base models):
 | **Δ Latent vs CoT** | 🔬 ours | 🟢 −34 ± 4 % | 🟢 −16 ± 1 % | 🟢 −43 ± 5 % | 🟢 −37 ± 3 % | 🟢 −36 ± 3 % | 🟢 −41 ± 5 % | 🟢 −34 ± 4 % | 🟢 −36 ± 3 % |
 |  | 📄 paper | 🟢 −20 % | 🟢 −6 % | 🟢 −25 % | 🟢 −13 % | 🟢 −16 % | 🟢 −29 % | 🟢 −12 % | 🟢 −20 % |
 
-| 🦙 **Llama-3.2-3B-Instruct** | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
+<br>
+
+#### <img align="top" src="assets/model-llama-3.2-3b-instruct.svg" alt="Llama-3.2-3B-Instruct">
+
+| Variant | Source | 🏠 MATH | 🏠 GSM8K | 🌍 Gaokao-Math-2023 | 🌍 DM-Math | 🌍 College-Math | 🌍 Olympiad-Math | 🌍 TheoremQA | 📊 All |
 | :-- | :-- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | **Sol-Only** | 🔬 ours | 8.8 | 7.1 | 9.5 | 7.0 | 11.9 | 8.0 | 8.8 | 8.7 |
 | **CoT** | 🔬 ours | 215.3 | 123.6 | 250.5 | 178.4 | 257.0 | 264.2 | 234.7 | 217.7 |

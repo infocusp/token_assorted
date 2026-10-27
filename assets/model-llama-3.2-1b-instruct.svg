@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="194" height="46" viewBox="0 0 194 46" role="img" aria-label="Llama-3.2-1B-Instruct">
+  <title>Llama-3.2-1B-Instruct</title>
+  <g transform="translate(0 8)">
+  <rect x="0.5" y="0.5" width="193" height="29" rx="14.5" fill="#DDF4FF" stroke="#54AEFF"/>
+  <text x="14" y="15.0" dominant-baseline="central" font-size="14">🦙</text>
+  <text x="37" y="15.0" dominant-baseline="central" fill="#0969DA" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" textLength="143" lengthAdjust="spacingAndGlyphs">Llama-3.2-1B-Instruct</text>
+  </g>
+</svg>

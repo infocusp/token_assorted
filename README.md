@@ -21,7 +21,7 @@ Paper link: https://arxiv.org/abs/2502.03275
 
 **Paper summary.** Chain-of-thought traces are long, and much of their text serves fluency rather than
 reasoning. The paper replaces the *initial* part of each trace with discrete latent tokens produced by a
-VQ-VAE, keeps the rest as ordinary text, and fine-tunes an LLM on this hybrid sequence with an extended
+[VQ-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#vq-vae-and-vq-vae-2), keeps the rest as ordinary text, and fine-tunes an LLM on this hybrid sequence with an extended
 vocabulary. To help the model adapt to the unseen latent tokens, training randomly varies how much of the
 trace is latent, mixing latent and text tokens. The result is shorter reasoning traces (an average
 **17% reduction** in trace length), and the authors report that the approach consistently outperforms
@@ -41,7 +41,7 @@ Llama-3.2-3B.
 
 1. Loads **MetaMathQA** (`meta-math/MetaMathQA`) from HuggingFace.
 2. **`src/train.py`** — trains the VQ-VAE.
-3. Saves the trained model (token embedding + encoder + codebook + decoder).
+3. Saves the trained model (token embedding + encoder + [codebook](src/README.md#the-method) + decoder).
 4. **`src/encode_dataset.py`** — converts the CoT portion of each example into discrete code indices
    and writes a JSONL artifact. **This file is the Stage-1 → Stage-2 hand-off boundary.**
 5. **`src/decode_codes.py`** — decodes code indices back to text, for sanity checks / interpretability.
@@ -136,7 +136,7 @@ Printed to the terminal every `log_every` steps (train) and every `eval_every` s
 - `recon_acc` — fraction of non-pad tokens the decoder reconstructs correctly (argmax equals the target).
 - `vq_loss` — quantizer loss; with the EMA codebook it is only `β · commitment` (shown as `0.0` on val by design).
 - `codebook_active_frac` — fraction of the `|E|` codebook entries used in the current batch (capped by the number of valid codes per batch).
-- `codebook_perplexity` — `exp(entropy)` of the code-usage distribution in the batch: ~1 means collapse onto one code, ~`|E|` means uniform usage.
+- [`codebook_perplexity`](https://arxiv.org/html/2601.22244#S4.SS1) — `exp(entropy)` of the code-usage distribution in the batch: ~1 means collapse onto one code, ~`|E|` means uniform usage.
 - `lr` — current learning rate (train only).
 - `global_active_frac`, `global_perplexity` — the same two codebook statistics accumulated over the whole validation set, the reliable collapse signal (val only).
 
@@ -229,7 +229,7 @@ models take about the same as their base models):
 | Base | Variant | Train | 7-benchmark eval |
 |:--|:--|:-:|:-:|
 | Llama-3.2-1B | CoT / Latent | ~1.0 h | ~0.5 h |
-| Llama-3.2-1B | Sol-Only | ~0.3 h | ~0.1 h |
+| Llama-3.2-1B | [Sol-Only](#training-variants) | ~0.3 h | ~0.1 h |
 | Llama-3.2-3B | CoT | ~3.1 h | ~1.7 h |
 | Llama-3.2-3B | Latent | ~2.6 h | ~1.0 h |
 | Llama-3.2-3B | Sol-Only | ~1.1 h | ~0.1 h |
@@ -242,7 +242,7 @@ models take about the same as their base models):
 - **Accuracy** — `accuracy_official` in %: the share of greedy generations that the benchmark's own official evaluator marks correct (GSM8K and MATH test sets plus five out-of-domain benchmarks).
 - **Mean generated tokens** — `mean_gen_tokens`: average response length per problem, counted up to and including EOS and capped at `max_new_tokens = 512`; every latent code counts as one token.
 
-**Setup.** 4 base models (Llama-3.2-1B, 1B-Instruct, 3B, 3B-Instruct) × 3 training variants × 3 seeds (42, 43, 44) = 36 deterministic full fine-tunes (1 epoch on MetaMathQA, lr 1e-4, effective batch 32), each evaluated greedily in fp32 on all 7 benchmarks. The variants are **Sol-Only** (prompt → answer, no reasoning), **CoT** (full text reasoning) and **Latent** (assorted latent + text, the paper's method). 🔬 **ours** rows are mean ± sample std over the 3 seeds; 📄 **paper** rows are the paper's numbers as printed (Su et al., Tables 4.2 and 4.3). The paper's models are Llama-3.2-1B, Llama-3.2-3B and Llama-3.1-8B, so the Instruct models have no paper counterpart and the 8B model is not reproduced here.
+<a id="training-variants"></a>**Setup.** 4 base models (Llama-3.2-1B, 1B-Instruct, 3B, 3B-Instruct) × 3 training variants × 3 seeds (42, 43, 44) = 36 deterministic full fine-tunes (1 epoch on MetaMathQA, lr 1e-4, effective batch 32), each evaluated greedily in fp32 on all 7 benchmarks. The variants are **Sol-Only** (prompt → answer, no reasoning), **CoT** (full text reasoning) and **Latent** (assorted latent + text, the paper's method). 🔬 **ours** rows are mean ± sample std over the 3 seeds; 📄 **paper** rows are the paper's numbers as printed (Su et al., Tables 4.2 and 4.3). The paper's models are Llama-3.2-1B, Llama-3.2-3B and Llama-3.1-8B, so the Instruct models have no paper counterpart and the 8B model is not reproduced here.
 
 ### Accuracy (%) — counterpart of the paper's Table 4.2
 
@@ -377,7 +377,7 @@ The paper underspecifies several points; here is exactly what this implementatio
 | **Transformer blocks** | **`searchformer`** (vendored: pre-norm RMSNorm + RoPE + SwiGLU, FFN 1536) | `transformer_impl: vanilla` swaps in `src/vanilla_blocks.py` — a plain pre-norm transformer written from scratch (LayerNorm + GELU + learned absolute positions). Same causal self-attention and same topology, so it is a components-only ablation. Separate checkpoint lineage: a cross-arm `load_state_dict` fails loudly. |
 | **Down-sampling** `T → T/r` | learnable `Conv1d(d, d, kernel=r, stride=r)` | our default; latentplan uses `MaxPool1d` — we chose a learnable conv. |
 | **Up-sampling** (parallel mode) | learnable `ConvTranspose1d(d, d, kernel=r, stride=r)` — the exact inverse of the `Conv1d` down-sampler | gives each of the `r` positions inside a chunk its own `d→d` projection of the code. `upsample_mode: repeat` (`repeat_interleave ×r`, an identical copy per position) is kept as the ablation baseline — see the results table. Only used when `decoder_mode=parallel`. |
-| **Prompt conditioning `g(P)`** | masked mean-pool of prompt token embeddings → 1 vector; parallel: prepended to the decoder input as a conditioning token (AR: prepended to the cross-attention memory) | adapts latentplan's state-conditioning idea, so the decode is conditioned on `g(P)` as well as the codes. |
+| **[Prompt conditioning](https://arxiv.org/html/2502.03275#S3.SS1) `g(P)`** | masked mean-pool of prompt token embeddings → 1 vector; parallel: prepended to the decoder input as a conditioning token (AR: prepended to the cross-attention memory) | adapts latentplan's state-conditioning idea, so the decode is conditioned on `g(P)` as well as the codes. |
 | **Codebook stabilization** | EMA codebook (`decay=0.99`) + `kmeans_init` + dead-code restart (`threshold_ema_dead_code=0.1`, `vq_reset_cluster_size=2.0`) | `decay=0.99` (not the library's 0.8) is the key collapse guard for 1024 codes at `lr=1e-5`. |
 | **Codebook dim** | `codebook_dim = d_model` (codebook in R^d, paper-faithful) | `codebook_dim < d_model` is buggy with `forward(mask=...)` in vector-quantize-pytorch 1.29.1 (commitment loss compares mismatched dims), so we keep it equal to `d`. |
 | **Straight-through** | plain STE (`rotation_trick=False`) | the library defaults `rotation_trick=True`; we disable it to match the paper's standard STE. Both still send gradient to the encoder. |

@@ -98,9 +98,6 @@ uv pip install -r requirements.txt
 ### Usage
 
 ```bash
-# 0) (optional) pre-download MetaMathQA (~188 MB; otherwise fetched on the first real run)
-python scripts/download_data.py --out ./data
-
 # 1) Smoke test (CPU, offline, ~25 s)
 python -m src.train --config config/vqvae_llama.yaml --smoke
 
@@ -402,7 +399,6 @@ The paper underspecifies several points; here is exactly what this implementatio
 │   ├── vqvae_llama_repeat.yaml
 │   └── vqvae_llama_vanilla.yaml
 ├── scripts
-│   ├── download_data.py
 │   ├── eval_stage2_all.sh
 │   ├── make_fixture.py
 │   ├── rescore_generations.py

@@ -193,6 +193,31 @@ uv pip install "peft==0.19.1" "accelerate==1.14.0" "fire==0.7.1"
 uv pip install --no-deps "llama-cookbook==0.0.5.post1"
 ```
 
+### Quick start
+
+Ask the released Stage-2 model a question. It needs the dependencies from step 2 of Setup. The first run downloads the model (~2.5 GB) from the Hugging Face Hub; later runs use the cache.
+
+```bash
+# To use a model you trained yourself instead, replace infocusp/stage2-LLM with its output_dir,
+# e.g. --model runs/stage2-llama1b
+python -m src.stage2_infer --model infocusp/stage2-LLM \
+    --question "A school bus has 9 rows with 4 seats in each row. If 27 seats are taken, how many seats are empty?"
+```
+
+Output (greedy decoding, so the same question always gives the same output):
+
+```text
+Question:
+A school bus has 9 rows with 4 seats in each row. If 27 seats are taken, how many seats are empty?
+
+Generation:
+<boLatent><Latent-code-970><eoLatent> 4 = 36 seats.
+If 27 seats are taken, then there are 36 - 27 = 9 empty seats.
+#### 9
+The answer is: 9<|end_of_text|>
+```
+
+The response opens with a latent code (`<Latent-code-970>`) that stands in for the first 16 tokens of the reasoning; the rest is ordinary text, ending in `The answer is: 9`.
 
 ### Usage
 
